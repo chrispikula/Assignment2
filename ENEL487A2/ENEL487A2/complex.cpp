@@ -9,11 +9,12 @@ It can calculate (+,-,/,*) of two complex numbers
 */
 
 #include <iostream>  
+#include <algorithm>
 #include <string>
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
-#include <cmath>
+
 
 using std::cout;
 using std::cerr;
@@ -24,36 +25,39 @@ using std::ofstream;
 using std::ifstream;
 using std::streambuf;
 using std::istringstream;
+using std::transform;
 
-struct Complex 
+class Complex 
 /**
 This is our data-structure that holds our complex number, 
 as well as holding the operator functions that perform the four basic
 arithmetic operations on them.
 */
 {
+	public:
 	double real;
 	double img;
-	struct Complex& operator+=(const Complex& rhs)
+	
+	class Complex& operator+=(const Complex& rhs)
 	{
 		real += rhs.real;
 		img += rhs.img;
 		return *this;
 	}
-	struct Complex& operator-=(const Complex& rhs)
+	class Complex& operator-=(const Complex& rhs)
 	{
 		real -= rhs.real;
 		img -= rhs.img;
 		return *this;
 	}
-	struct Complex operator*(const Complex rhs)
+	class Complex operator*(const Complex rhs)
 	{
 		Complex result;
 		result.real = real*rhs.real - img * rhs.img;
 		result.img = real*rhs.img + img * rhs.real;
 		return result;
 	}
-	struct Complex operator/(const Complex rhs)
+	class Complex operator/(const Complex rhs)
 	{
 		Complex result;
 		result.real = (real*rhs.real + img*rhs.img) / 
@@ -62,7 +66,23 @@ arithmetic operations on them.
 			(rhs.real*rhs.real + rhs.img*rhs.img);
 		return result;
 	}
+
+	double ABS(void);
+	double ARG(void);
+	double ARGDEG(void);
+	double EXP(void);
+	double INV(void);
 };
+
+double Complex::ABS(void)
+{
+	return sqrt(real*real + img * img);
+}
+
+double Complex::ARG(void)
+{
+	return real;
+}
 inline Complex operator+(Complex lhs, const Complex& rhs)
 /**
 This function outputs the result of adding two Complex structs
@@ -124,7 +144,7 @@ from our parse function, as well as it is used to pass the data to the
 calculator function
 */
 {
-	char operation;
+	string operation;
 	Complex first;
 	Complex second;
 };
@@ -146,7 +166,7 @@ void consoleText()
 	This is our function that tells the user how to use the program 
 	once it starts
 	*/
-	cerr << "Type a letter to specify the aritmetic operator "
+	cerr << "Type a letter to specify the arithmetic operator "
 		<< "(A, S, M, D)" << endl
 		<< "followed by two complex numbers expressed as "
 		<< "pairs of doubles." << endl 
@@ -193,25 +213,47 @@ number of entries to do this.
 	bool fail = false;
 	fail |= stringstreamCont(ss);
 	ss >> operation.operation;
-	if (operation.operation == 'a' || operation.operation == 'A')
+	std::transform(operation.operation.begin(), operation.operation.end(),
+		operation.operation.begin(), ::toupper);
+	if (operation.operation == "a" || operation.operation == "A")
 	{
-		operation.operation = 'A';
+		operation.operation = "A";
 	}
-	else if (operation.operation == 's' || operation.operation == 'S')
+	else if (operation.operation == "s" || operation.operation == "S")
 	{
-		operation.operation = 'S';
+		operation.operation = "S";
 	}
-	else if (operation.operation == 'm' || operation.operation == 'M')
+	else if (operation.operation == "m" || operation.operation == "M")
 	{
-		operation.operation = 'M';
+		operation.operation = "M";
 	}
-	else if (operation.operation == 'd' || operation.operation == 'D')
+	else if (operation.operation == "d" || operation.operation == "D")
 	{
-		operation.operation = 'D';
+		operation.operation = "D";
 	}
-	else if (operation.operation == 'q' || operation.operation == 'Q')
+	else if (operation.operation == "ABS")
 	{
-		operation.operation = 'Q';
+		operation.operation = "ABS";
+	}
+	else if (operation.operation == "ARG")
+	{
+		operation.operation = "ARG";
+	}
+	else if (operation.operation == "ARGDEG")
+	{
+		operation.operation = "ARGDEG";
+	}
+	else if (operation.operation == "EXP")
+	{
+		operation.operation = "EXP";
+	}
+	else if (operation.operation == "INV")
+	{
+		operation.operation = "INV";
+	}
+	else if (operation.operation == "q" || operation.operation == "Q")
+	{
+		operation.operation = "Q";
 		return operation;
 	}
 	else
@@ -240,22 +282,47 @@ MathOperation object.
 */
 {
 	Complex result;
-	if (input.operation == 'A')
+	if (input.operation == "A")
 	{
 		result = input.first + input.second;
 	}
-	else if (input.operation == 'S')
+	else if (input.operation == "S")
 	{
 		result = input.first - input.second;
 	} 
-	else if (input.operation == 'M')
+	else if (input.operation == "M")
 	{
 		result = input.first * input.second;
 	}
-	else if (input.operation == 'D')
+	else if (input.operation == "D")
 	{
 		result = input.first / input.second;
 	} 
+	else if (input.operation == "ABS")
+	{
+		result = input.first.ABS();
+	}
+	else if (input.operation == "ARG")
+	{
+		result = input.first.ARG();
+	}
+	else if (input.operation == "ARGDEG")
+	{
+		result = input.first.ARGDEG();
+	}
+	else if (input.operation == "EXP")
+	{
+		result = input.first.EXP();
+	}
+	else if (input.operation == "INV")
+	{
+		result = input.first.INV();
+	}
+	//SEE http://www.cplusplus.com/forum/beginner/18489/ /////////////////////////////////////////////////////////////
+
+
+
+
 	return result;
 }
 
@@ -336,11 +403,11 @@ Our main program
 			break;
 		}
 		parsedInput = parseLine(input);
-		if (parsedInput.operation == 'Q')
+		if (parsedInput.operation == "Q")
 		{
 			break;
 		}
-		else if (parsedInput.operation == 'F')
+		else if (parsedInput.operation == "F")
 		{
 			cerr << endl; 
 			cout << endl;
