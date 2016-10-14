@@ -70,8 +70,8 @@ arithmetic operations on them.
 	double ABS(void);
 	double ARG(void);
 	double ARGDEG(void);
-	double EXP(void);
-	double INV(void);
+	Complex EXP(void);
+	Complex INV(void);
 };
 
 double Complex::ABS(void)
@@ -81,7 +81,27 @@ double Complex::ABS(void)
 
 double Complex::ARG(void)
 {
-	return real;
+	return -1;
+}
+
+double Complex::ARGDEG(void)
+{
+	return -1;
+}
+
+Complex Complex::EXP(void)
+{
+	Complex result;
+	result.real = pow(2.71, real) * cos(img);
+	result.img = pow(2.71, real) * sin(img);
+}
+
+Complex Complex::INV(void)
+{
+	Complex one;
+	one.real = 1;
+	one.img = 0;
+	return one / *this;
 }
 inline Complex operator+(Complex lhs, const Complex& rhs)
 /**
@@ -300,15 +320,15 @@ MathOperation object.
 	} 
 	else if (input.operation == "ABS")
 	{
-		result = input.first.ABS();
+		result.real = input.first.ABS();
 	}
 	else if (input.operation == "ARG")
 	{
-		result = input.first.ARG();
+		result.real = input.first.ARG();
 	}
 	else if (input.operation == "ARGDEG")
 	{
-		result = input.first.ARGDEG();
+		result.real = input.first.ARGDEG();
 	}
 	else if (input.operation == "EXP")
 	{
